@@ -1,0 +1,16 @@
+{
+  "name": "static-site-generator",
+  "scripts": {
+    "dev": "node -r @babel/register src/index.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "@babel/register": "^7.11.5"
+  },
+  "dependencies": {
+    "react": "^16.13.1"
+  }
+}
