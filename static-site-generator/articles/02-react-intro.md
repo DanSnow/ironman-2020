@@ -1,7 +1,7 @@
 React 介紹與建構環境
 ====================
 
-> 這篇的程式碼在 https://github.com/ironman-2020/tree/master/static-site-generator
+> 這篇與之後的程式碼在 https://github.com/ironman-2020/tree/master/static-site-generator
 
 React 要怎麼寫我想應該有一大堆的鐵人賽文章有介紹了，這邊最主要是我想介紹它的特點，以及我為什麼要選擇 React 來做這次的 SSG ，當然有一部份原因是因為我是 React 教徒，但這大概只佔了 30% 左右的原因而已
 
@@ -37,7 +37,11 @@ Gatsby
 
 雖然這跟 React 本身無關，而是 React 的生態系的一部份， Gatsby 是建在 React 之上的成熟的 SSG，正是這個系列要達成的目標，這個系列會參考 Gatsby 的功能，但不會去抄它的程式碼，如果我真的抄了也會告訴你，實際上也不只是 Gatsby ，本系列還會用到另一個是建立在 React 生態系上的東西， mdx (雖然 mdx 也要開始支援 Vue 了，不過目前還在 alpha 中)，我們會用它來當作一個檔案的資料來源，至於使用起來是什麼樣子，敬請期待
 
-以上這兩個就是我選擇 React 主要的原因，那麼接下來就開始建環境吧，我們會按部就班來，環境也會慢慢的建起來，這次只要先準備讓 React 的 jsx 也能在 Node.js 下執行的環境就行了
+建置環境
+-----
+
+
+介紹完這兩個就是我選擇 React 主要的原因，那麼接下來就開始建環境吧，我們會按部就班來，環境也會慢慢的建起來，這次只要先準備讓 React 的 jsx 也能在 Node.js 下執行的環境就行了
 
 這邊先假設你有安裝 `yarn` 了，推薦是 yarn 1.22 以上的版本，因為你會需要它來安裝 yarn v2 ，本系列一開始說過，我們會用 yarn v2 來做套件管理，關於 yarn v2 的差別，我可以之後寫一篇文章介紹，但不是在這個系列裡，如果你不想跟著使用 yarn v2 也可以用你自己習慣的，總之先來把 yarn v2 安裝起來，要安裝 yarn v2 的話，請執行以下指令：
 
@@ -91,3 +95,5 @@ $ yarn node -r @babel/register src/index.js
 這樣之後只要用 `yarn dev` 就可以執行了
 
 > 題外話，我自己是使用 [`oh-my-zsh`](https://github.com/ohmyzsh/ohmyzsh) 附的 `yarn` 的外掛，內建有把 `yd` 設定為 `yarn dev` 的別名，因為不是每個人都有這些別名的設定，所以文章中我用的都是完整的指令，不過如果你有用 zsh 很推薦你去裝 `oh-my-zsh` 並習慣一下它設定的別名，可以讓你少打很多字，速度更快 (如： `yarn add --dev` 是 `yad`, `yarn add` 是 `ya`)
+
+下一篇要來介紹 Server Side Render 與一般在 Client Side 的環境有什麼不同
