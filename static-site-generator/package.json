@@ -11,6 +11,8 @@
     "@babel/register": "^7.11.5"
   },
   "dependencies": {
-    "react": "^16.13.1"
+    "express": "^4.17.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   }
 }
