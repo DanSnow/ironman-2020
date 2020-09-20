@@ -1,7 +1,7 @@
 React 介紹與建構環境
 ====================
 
-> 這篇與之後的程式碼在 https://github.com/ironman-2020/tree/master/static-site-generator
+> 這篇與之後的程式碼在 https://github.com/DanSnow/ironman-2020/tree/master/static-site-generator
 
 React 要怎麼寫我想應該有一大堆的鐵人賽文章有介紹了，這邊最主要是我想介紹它的特點，以及我為什麼要選擇 React 來做這次的 SSG ，當然有一部份原因是因為我是 React 教徒，但這大概只佔了 30% 左右的原因而已
 
