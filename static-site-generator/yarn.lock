@@ -2385,6 +2385,13 @@ resolve@^1.3.2:
   languageName: node
   linkType: hard
 
+"slugify@npm:^1.4.5":
+  version: 1.4.5
+  resolution: "slugify@npm:1.4.5"
+  checksum: d402a9163144e6e5c904a3409383e0c780422fea93d32c023622cc8eaeab34e2ed0e28c69402704038ef771f6f4bb636619b142db6913165fa9f5328229773da
+  languageName: node
+  linkType: hard
+
 "source-map-support@npm:^0.5.16":
   version: 0.5.19
   resolution: "source-map-support@npm:0.5.19"
@@ -2421,6 +2428,7 @@ resolve@^1.3.2:
     express: ^4.17.1
     react: ^16.13.1
     react-dom: ^16.13.1
+    slugify: ^1.4.5
   languageName: unknown
   linkType: soft
 
