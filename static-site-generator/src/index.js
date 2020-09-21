@@ -2,33 +2,11 @@ import express from 'express'
 import React from 'react'
 import { renderToString, renderToStaticMarkup } from 'react-dom/server'
 import { App } from './components/App'
-import slugify from 'slugify'
+import { articles } from './articles'
 
 const app = express()
 
-const articles = [
-  {
-    title: 'How to write a Static Site Generator',
-    content: 'We will introduce you how to write a Static Site Generator...',
-  },
-  {
-    title: 'First Post',
-    content: 'My first post',
-  },
-].map((article) =>
-  article.slug
-    ? article
-    : {
-        slug: slugify(article.title, { lower: true }),
-        ...article,
-      }
-)
-
-app.get('/', (req, res) => {
-  res.send(renderHTML(toLocation(req)))
-})
-
-app.get('/articles/:slug', (req, res) => {
+app.get('/*', (req, res) => {
   res.send(renderHTML(toLocation(req)))
 })
 
@@ -56,5 +34,5 @@ function renderHTML(location) {
 }
 
 function toLocation(req) {
-  return { pathname: req.path, params: req.params }
+  return { pathname: req.path }
 }
