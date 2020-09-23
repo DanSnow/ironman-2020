@@ -1,9 +1,9 @@
-import { articles } from './articles'
+import { articles } from './data'
 import { configureStore } from '@reduxjs/toolkit'
-import { articleSlice } from './store/slice/article'
+import { articleSlice } from './slices/articles'
 
 export const store = configureStore({
-  reducer: articleSlice.reducer,
+  reducer: { articles: articleSlice.reducer },
 })
 
 const { setArticles } = articleSlice.actions

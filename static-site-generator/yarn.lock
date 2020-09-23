@@ -1740,6 +1740,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"generator@workspace:packages/generator":
+  version: 0.0.0-use.local
+  resolution: "generator@workspace:packages/generator"
+  dependencies:
+    "@babel/core": ^7.11.6
+    "@babel/plugin-proposal-class-properties": ^7.10.4
+    "@babel/preset-env": ^7.11.5
+    "@babel/preset-react": ^7.10.4
+    "@babel/register": ^7.11.5
+    "@reduxjs/toolkit": ^1.4.0
+    express: ^4.17.1
+    import-cwd: ^3.0.0
+    import-modules: ^2.0.0
+    ky: ^0.23.0
+    ky-universal: ^0.8.2
+    react: ^16.13.1
+    react-dom: ^16.13.1
+    react-redux: ^7.2.1
+    react-router-dom: ^5.2.0
+    redux: ^4.0.5
+    slugify: ^1.4.5
+  bin:
+    generator: bin/cli.js
+  languageName: unknown
+  linkType: soft
+
 "gensync@npm:^1.0.0-beta.1":
   version: 1.0.0-beta.1
   resolution: "gensync@npm:1.0.0-beta.1"
@@ -1839,6 +1865,31 @@ __metadata:
   version: 7.0.9
   resolution: "immer@npm:7.0.9"
   checksum: 20fba3dabd033f9584eb1df9c16210b64c16a536a6376b0dedf153176554d89432ee86409458d8773edd142ddcae75f8e242b1952cd5b61c22767a4538880dd0
+  languageName: node
+  linkType: hard
+
+"import-cwd@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "import-cwd@npm:3.0.0"
+  dependencies:
+    import-from: ^3.0.0
+  checksum: 5689cfc5d26336ed9ae15a2c725d881845a2455a75fdd92cf715fa92e13ede901cf95c7bb48aeca9b7612f23d53380ff762defc804403f653eedcf53c37e9e5c
+  languageName: node
+  linkType: hard
+
+"import-from@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "import-from@npm:3.0.0"
+  dependencies:
+    resolve-from: ^5.0.0
+  checksum: ba66d42da541286fe50afe800a506534560c067eac7fa1c5fa83b4ea69eb92952adf6bff4ae6a3ea2e45780a874aa0341e4101e6ebc3f9b8fd6b83ac29fafe1b
+  languageName: node
+  linkType: hard
+
+"import-modules@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "import-modules@npm:2.0.0"
+  checksum: 81b7f5c762d3775ddc75195f0b97aaa1e9a6d219ae4b9a896b2e46daafd0e3911563f75e819d65b6272329f06d221da539f78aa045c967097c8cb8beac64154c
   languageName: node
   linkType: hard
 
@@ -2117,6 +2168,28 @@ __metadata:
   checksum: 9b65fb709bc30c0c07289dcbdb61ca032acbb9ea5698b55fa62e2cebb04c5953f1876a1f3f7f4bc2e91d4bf4d86003f3e207c3bc6ee2f716f99827e62389cd0e
   languageName: node
   linkType: hard
+
+"my-blog@workspace:packages/my-blog":
+  version: 0.0.0-use.local
+  resolution: "my-blog@workspace:packages/my-blog"
+  dependencies:
+    "@babel/core": ^7.11.6
+    "@babel/plugin-proposal-class-properties": ^7.10.4
+    "@babel/preset-env": ^7.11.5
+    "@babel/preset-react": ^7.10.4
+    "@babel/register": ^7.11.5
+    "@reduxjs/toolkit": ^1.4.0
+    generator: "workspace:packages/generator"
+    ky: ^0.23.0
+    ky-universal: ^0.8.2
+    react: ^16.13.1
+    react-dom: ^16.13.1
+    react-redux: ^7.2.1
+    react-router-dom: ^5.2.0
+    redux: ^4.0.5
+    slugify: ^1.4.5
+  languageName: unknown
+  linkType: soft
 
 "negotiator@npm:0.6.2":
   version: 0.6.2
@@ -2503,6 +2576,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"resolve-from@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "resolve-from@npm:5.0.0"
+  checksum: 0d29fc7012eb21f34d2637fa0602694f60e64c14bf5fbd5395b72f6ea5540a6906cbeef062edefc34c22fd802bfe8ae46ef936e6c4a3f1b1047390f9738dd76f
+  languageName: node
+  linkType: hard
+
 "resolve-pathname@npm:^3.0.0":
   version: 3.0.0
   resolution: "resolve-pathname@npm:3.0.0"
@@ -2650,16 +2730,6 @@ resolve@^1.3.2:
     "@babel/preset-env": ^7.11.5
     "@babel/preset-react": ^7.10.4
     "@babel/register": ^7.11.5
-    "@reduxjs/toolkit": ^1.4.0
-    express: ^4.17.1
-    ky: ^0.23.0
-    ky-universal: ^0.8.2
-    react: ^16.13.1
-    react-dom: ^16.13.1
-    react-redux: ^7.2.1
-    react-router-dom: ^5.2.0
-    redux: ^4.0.5
-    slugify: ^1.4.5
   languageName: unknown
   linkType: soft
 

@@ -5,7 +5,7 @@ export const articleAdapter = createEntityAdapter({
   selectId: ({ slug }) => slug,
 })
 
-export const articleSelector = articleAdapter.getSelectors()
+export const articleSelector = articleAdapter.getSelectors((state) => state.articles)
 
 export const fetchArticles = createAsyncThunk('articles/fetchArticles', () => {
   return ky.get('http://localhost:3000/api/articles').json()
@@ -26,3 +26,5 @@ export const articleSlice = createSlice({
     [fetchArticleById.fulfilled]: articleAdapter.addOne,
   },
 })
+
+export const reducer = articleSlice.reducer

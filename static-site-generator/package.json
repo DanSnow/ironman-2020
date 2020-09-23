@@ -3,23 +3,14 @@
   "scripts": {
     "dev": "node -r @babel/register src/index.js"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
     "@babel/register": "^7.11.5"
-  },
-  "dependencies": {
-    "@reduxjs/toolkit": "^1.4.0",
-    "express": "^4.17.1",
-    "ky": "^0.23.0",
-    "ky-universal": "^0.8.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-redux": "^7.2.1",
-    "react-router-dom": "^5.2.0",
-    "redux": "^4.0.5",
-    "slugify": "^1.4.5"
   }
 }

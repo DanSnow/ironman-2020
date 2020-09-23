@@ -1,22 +1,23 @@
+import { resolve } from 'path'
 import express from 'express'
 import React from 'react'
 import { renderToString, renderToStaticMarkup } from 'react-dom/server'
-import { App } from './components/App'
-import { articles } from './articles'
-import { store } from './server-store'
-import { createStore } from './store'
-import { articleSelector, fetchArticleById, fetchArticles } from './store/slice/article'
 import { matchPath } from 'react-router-dom'
+import importCwd from 'import-cwd'
+import importModules from 'import-modules'
+import { createStore } from './app/store'
+import { AppProvider } from './app/components/AppProvider'
 
+const config = importCwd('./config.js').default
+const App = importCwd('./src/index.js').default
+const { fetchArticleById, fetchArticles } = importCwd('./src/slices/articles.js')
 const app = express()
 
-app.get('/api/articles/:slug', (req, res) => {
-  res.json(articleSelector.selectById(store.getState(), req.params.slug))
-})
+const slices = importModules(resolve(process.cwd(), 'src/slices'))
 
-app.get('/api/articles', (_req, res) => {
-  res.json(articleSelector.selectAll(store.getState()))
-})
+const reducer = createReducer(slices)
+
+config.api(app)
 
 app.get('/*', async (req, res) => {
   res.send(await renderHTML(toLocation(req)))
@@ -27,7 +28,7 @@ app.listen(3000, () => {
 })
 
 async function renderHTML(location) {
-  const store = createStore()
+  const store = createStore(reducer)
 
   if (location.pathname === '/') {
     await store.dispatch(fetchArticles())
@@ -48,7 +49,11 @@ async function renderHTML(location) {
         <div
           id="root"
           dangerouslySetInnerHTML={{
-            __html: renderToString(<App store={store} title={'My Blog'} location={location} articles={articles} />),
+            __html: renderToString(
+              <AppProvider store={store} location={location}>
+                <App />
+              </AppProvider>
+            ),
           }}
         />
       </body>
@@ -58,4 +63,14 @@ async function renderHTML(location) {
 
 function toLocation(req) {
   return { pathname: req.path }
+}
+
+function createReducer(slices) {
+  const reducer = {}
+
+  for (const [name, slice] of Object.entries(slices)) {
+    reducer[name] = slice.reducer
+  }
+
+  return reducer
 }

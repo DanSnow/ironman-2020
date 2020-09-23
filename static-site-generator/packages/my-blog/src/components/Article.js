@@ -1,8 +1,8 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { articleSelector } from '../store/slice/article'
+import { articleSelector } from '../slices/articles'
 import { useParams } from 'react-router-dom'
-import { notFound } from '../articles'
+import { notFound } from '../data'
 
 function getArticle() {
   const params = useParams()
