@@ -3,7 +3,10 @@ import React from 'react'
 import { renderToString, renderToStaticMarkup } from 'react-dom/server'
 import { App } from './components/App'
 import { articles } from './articles'
-import { articleSelector, store } from './server-store'
+import { store } from './server-store'
+import { createStore } from './store'
+import { articleSelector, fetchArticleById, fetchArticles } from './store/slice/article'
+import { matchPath } from 'react-router-dom'
 
 const app = express()
 
@@ -15,15 +18,26 @@ app.get('/api/articles', (_req, res) => {
   res.json(articleSelector.selectAll(store.getState()))
 })
 
-app.get('/*', (req, res) => {
-  res.send(renderHTML(toLocation(req)))
+app.get('/*', async (req, res) => {
+  res.send(await renderHTML(toLocation(req)))
 })
 
 app.listen(3000, () => {
   console.log('server is running at http://localhost:3000')
 })
 
-function renderHTML(location) {
+async function renderHTML(location) {
+  const store = createStore()
+
+  if (location.pathname === '/') {
+    await store.dispatch(fetchArticles())
+  } else {
+    const match = matchPath(location.pathname, { path: '/articles/:slug' })
+    if (match) {
+      await store.dispatch(fetchArticleById(match.params.slug))
+    }
+  }
+
   return renderToStaticMarkup(
     <html>
       <head>
@@ -34,7 +48,7 @@ function renderHTML(location) {
         <div
           id="root"
           dangerouslySetInnerHTML={{
-            __html: renderToString(<App title={'My Blog'} location={location} articles={articles} />),
+            __html: renderToString(<App store={store} title={'My Blog'} location={location} articles={articles} />),
           }}
         />
       </body>

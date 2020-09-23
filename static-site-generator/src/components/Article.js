@@ -1,10 +1,13 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { articleSelector } from '../store/slice/article'
 import { useParams } from 'react-router-dom'
-import { articles, notFound } from '../articles'
+import { notFound } from '../articles'
 
 function getArticle() {
   const params = useParams()
-  return articles.find(({ slug }) => params.slug === slug) || notFound
+  const article = useSelector((state) => articleSelector.selectById(state, params.slug))
+  return article || notFound
 }
 
 export function Article({ article = getArticle() }) {
