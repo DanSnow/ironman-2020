@@ -8,29 +8,48 @@ import { noop } from './utils'
 export async function buildRoutes() {
   const pagesPath = resolve(process.cwd(), 'src/pages')
   const absolutePaths = await globby([join(pagesPath, '**/*.js')])
+  const routes = absolutePaths.map((absolutePath) => {
+    const projectPath = relative(process.cwd(), absolutePath)
+    const path = relative(pagesPath, absolutePath)
+    const parsed = parse(path)
+    const base = `/${parsed.dir}`
+
+    const mod = importCwd('./' + projectPath)
+    const { url, dynamic } = generateURL(parsed, base)
+
+    return {
+      dynamic,
+      url,
+      file: projectPath,
+      getStaticPaths: mod.getStaticPaths || noop,
+      getInitialProps: mod.getInitialProps || noop,
+      props: {
+        exact: url === '/',
+        path: url,
+        component: mod.default,
+      },
+    }
+  })
+
+  routes.sort((a, b) => (a.dynamic !== b.dynamic && !b.dynamic ? 1 : 0))
 
   return {
     notFound: resolveNotFound(),
-    routes: absolutePaths.map((absolutePath) => {
-      const projectPath = relative(process.cwd(), absolutePath)
-      const path = relative(pagesPath, absolutePath)
-      const parsed = parse(path)
-      const base = parsed.dir || '/'
+    routes,
+  }
+}
 
-      const mod = importCwd('./' + projectPath)
-      const url = parsed.name === 'index' ? base : join(base, parsed.name)
+function generateURL(parsed, base) {
+  let dynamic = false
+  const url = parsed.name === 'index' ? base : join(base, parsed.name)
+  const resolvedURL = url.replace(/_([^/]+)/g, (_m, name) => {
+    dynamic = true
+    return `:${name}`
+  })
 
-      return {
-        url,
-        file: projectPath,
-        getInitialProps: mod.getInitialProps || noop,
-        props: {
-          exact: url === '/',
-          path: url,
-          component: mod.default,
-        },
-      }
-    }),
+  return {
+    dynamic,
+    url: resolvedURL,
   }
 }
 

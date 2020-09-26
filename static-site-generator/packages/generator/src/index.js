@@ -8,7 +8,7 @@ import importModules from 'import-modules'
 import { createStore } from './app/store'
 import { AppProvider } from './app/components/AppProvider'
 import { buildRoutes, renderRoutes } from './routes'
-import { noop } from './utils'
+import { noop, findFirstMap } from './utils'
 
 const config = importCwd('./config.js').default
 const app = express()
@@ -32,9 +32,13 @@ app.listen(3000, () => {
 async function renderHTML(location) {
   const store = createStore(reducer)
   const { notFound, routes } = await routesPromise
-  const route = routes.find(({ props }) => matchPath(location.pathname, props)) || { getInitialProps: noop }
+  const findMatchRoute = ({ props, getInitialProps }) => {
+    const match = matchPath(location.pathname, props)
+    return match ? { ...match, getInitialProps } : undefined
+  }
+  const route = findFirstMap(routes, findMatchRoute) || { params: {}, getInitialProps: noop }
 
-  await route.getInitialProps({ store })
+  await route.getInitialProps({ store, route })
 
   return renderToStaticMarkup(
     <html>
