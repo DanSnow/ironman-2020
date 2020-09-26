@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-export function Layout({ title, children }) {
+export function Layout({ title = 'My Blog', children }) {
   const isHome = useLocation().pathname === '/'
 
   return (
@@ -14,8 +14,17 @@ export function Layout({ title, children }) {
             <h3 className="text-3xl text-center font-bold mb-8">{title}</h3>
           )}
         </Link>
+        <nav>
+          <ul className="flex border-b w-full px-4">
+            <li>
+              <Link to="/about" className="text-teal-600">
+                About
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </header>
-      <main>{children}</main>
+      <main className="mt-4">{children}</main>
     </div>
   )
 }

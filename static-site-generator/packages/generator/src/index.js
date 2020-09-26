@@ -7,10 +7,10 @@ import importCwd from 'import-cwd'
 import importModules from 'import-modules'
 import { createStore } from './app/store'
 import { AppProvider } from './app/components/AppProvider'
+import { buildRoutes, renderRoutes } from './routes'
+import { noop } from './utils'
 
 const config = importCwd('./config.js').default
-const App = importCwd('./src/index.js').default
-const { fetchArticleById, fetchArticles } = importCwd('./src/slices/articles.js')
 const app = express()
 
 const slices = importModules(resolve(process.cwd(), 'src/slices'))
@@ -18,6 +18,8 @@ const slices = importModules(resolve(process.cwd(), 'src/slices'))
 const reducer = createReducer(slices)
 
 config.api(app)
+
+const routesPromise = buildRoutes()
 
 app.get('/*', async (req, res) => {
   res.send(await renderHTML(toLocation(req)))
@@ -29,15 +31,10 @@ app.listen(3000, () => {
 
 async function renderHTML(location) {
   const store = createStore(reducer)
+  const { notFound, routes } = await routesPromise
+  const route = routes.find(({ props }) => matchPath(location.pathname, props)) || { getInitialProps: noop }
 
-  if (location.pathname === '/') {
-    await store.dispatch(fetchArticles())
-  } else {
-    const match = matchPath(location.pathname, { path: '/articles/:slug' })
-    if (match) {
-      await store.dispatch(fetchArticleById(match.params.slug))
-    }
-  }
+  await route.getInitialProps({ store })
 
   return renderToStaticMarkup(
     <html>
@@ -51,7 +48,7 @@ async function renderHTML(location) {
           dangerouslySetInnerHTML={{
             __html: renderToString(
               <AppProvider store={store} location={location}>
-                <App />
+                {renderRoutes(routes, notFound)}
               </AppProvider>
             ),
           }}
