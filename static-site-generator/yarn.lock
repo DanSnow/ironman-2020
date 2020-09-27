@@ -1675,6 +1675,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eta@npm:^1.11.0":
+  version: 1.11.0
+  resolution: "eta@npm:1.11.0"
+  checksum: d0dc983a46be9b2c9df6d64734c698e99455b9d8964eec47310c70791b084235fe20c4190fdcfaea55d1f786f8a94a2e1f7bd9a68070c5d721957ce3fa863295
+  languageName: node
+  linkType: hard
+
 "etag@npm:~1.8.1":
   version: 1.8.1
   resolution: "etag@npm:1.8.1"
@@ -1834,6 +1841,7 @@ __metadata:
     "@babel/preset-react": ^7.10.4
     "@babel/register": ^7.11.5
     "@reduxjs/toolkit": ^1.4.0
+    eta: ^1.11.0
     express: ^4.17.1
     globby: ^11.0.1
     import-cwd: ^3.0.0

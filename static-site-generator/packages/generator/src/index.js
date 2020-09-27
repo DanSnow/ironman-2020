@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import express from 'express'
 import React from 'react'
-import { renderToString, renderToStaticMarkup } from 'react-dom/server'
+import { renderToString } from 'react-dom/server'
 import { matchPath } from 'react-router-dom'
 import importCwd from 'import-cwd'
 import importModules from 'import-modules'
@@ -9,7 +9,11 @@ import { createStore } from './app/store'
 import { AppProvider } from './app/components/AppProvider'
 import { buildRoutes, renderRoutes } from './routes'
 import { noop, findFirstMap } from './utils'
+import { constants } from 'fs'
+import { access, readFile } from 'fs/promises'
+import { compile, render } from 'eta'
 
+const pkg = importCwd('./package.json')
 const config = importCwd('./config.js').default
 const app = express()
 
@@ -20,6 +24,7 @@ const reducer = createReducer(slices)
 config.api(app)
 
 const routesPromise = buildRoutes()
+const templatePromise = loadTemplate()
 
 app.get('/*', async (req, res) => {
   res.send(await renderHTML(toLocation(req)))
@@ -39,27 +44,27 @@ async function renderHTML(location) {
   const route = findFirstMap(routes, findMatchRoute) || { params: {}, getInitialProps: noop }
 
   await route.getInitialProps({ store, route })
+  const template = await templatePromise
+  return render(template, {
+    title: config.title || pkg.name || 'My Static site',
+    output: renderToString(
+      <AppProvider store={store} location={location}>
+        {renderRoutes(routes, notFound)}
+      </AppProvider>
+    ),
+  })
+}
 
-  return renderToStaticMarkup(
-    <html>
-      <head>
-        <title>My Blog</title>
-        <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
-      </head>
-      <body>
-        <div
-          id="root"
-          dangerouslySetInnerHTML={{
-            __html: renderToString(
-              <AppProvider store={store} location={location}>
-                {renderRoutes(routes, notFound)}
-              </AppProvider>
-            ),
-          }}
-        />
-      </body>
-    </html>
-  )
+async function loadTemplate() {
+  const path = resolve(process.cwd(), 'src/index.html')
+  try {
+    await access(path, constants.R_OK)
+    const content = await readFile(path, 'utf-8')
+    return compile(content)
+  } catch {
+    const content = await readFile(resolve(__dirname, 'app/index.html'))
+    return compile(content)
+  }
 }
 
 function toLocation(req) {
