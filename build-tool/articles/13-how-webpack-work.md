@@ -16,9 +16,13 @@ import { parseAsync, traverse } from '@babel/core'
 
 export class Module {
   constructor({ path, code }) {
+    // 檔案路徑
     this.path = path
+    // 所在的資料夾，用來方便計算相對位置
     this.dir = dirname(path)
+    // 程式碼
     this.code = code
+    // 相依的檔案
     this.dependencies = []
   }
 
@@ -26,7 +30,7 @@ export class Module {
     this.ast = await parseAsync(this.code)
     traverse(this.ast, {
       ImportDeclaration: (path) => {
-        // 找出所有的 import
+        // 找出所有的 import ，並 push 進 dependencies
         this.dependencies.push(resolve(this.dir, path.node.source.value))
       },
     })
@@ -43,17 +47,21 @@ import pMap from 'p-map'
 
 export class Bundler {
   constructor(entry) {
+    // 啟始檔案的路徑
     this.entryPath = entry
+    // 處理過的 module 的 cache
     this.modules = {}
   }
 
   async execute() {
+    // 紀錄啟始的 module
     this.entry = await this.loadModule(this.entryPath)
 
     // 紀錄看過的檔案
     const seen = new Set()
     // 就是 Queue
     let queue = [this.entry]
+    // 執行到 queue 中沒有檔案可以處理
     while (queue.length) {
       const mod = queue.shift()
       seen.add(mod.path)
@@ -90,12 +98,19 @@ export class Bundler {
 const requireTemplate = template('const %%imports%% = require(%%file%%)')
 
 export class Module {
+  constructor({ path, code, context }) {
+    // 這邊用相對路徑來當作檔案的 id
+    this.id = relative(context, path)
+    // 省略
+  }
+
   async parse() {
     this.ast = await parseAsync(this.code)
     traverse(this.ast, {
       ImportDeclaration: (path) => {
         const file = path.node.source.value
 
+        // 相依套件的完整的路徑
         const dep = resolve(this.dir, file)
 
         this.dependencies.push(dep)
@@ -128,10 +143,12 @@ export class Module {
       },
     })
 
+    // 儲存轉換後的 code
     this.transformedCode = generate(this.ast).code
   }
 }
 
+// 取得 import 的資訊
 function extractImport(specifier) {
   if (t.isImportDefaultSpecifier(specifier)) {
     // default import 的話那 key 就是 default 了
@@ -141,6 +158,7 @@ function extractImport(specifier) {
   }
 }
 
+// 取得 export 的資訊
 function getIdentifier(node) {
   if (t.isExportNamedDeclaration(node)) {
     return t.identifier(node.declaration.id.name)
@@ -228,6 +246,6 @@ function wrapCode(code) {
 $ yarn node -r @babel/register src/index.js
 ```
 
-當然 webpack 實際上做的東西還要來的更多，比如這個簡化的 bundler 在引入時就沒辦法省略副檔名，當然引入其它類型的檔案是完全不行的，這部份就是 webpack 的 loader 所做的事了， loader 會把其它類型的檔案也轉換成 webpack 所能處理的 js 檔，像 css 就是以字串的形式附在程式碼裡，而圖片等則是以檔名的形式
+當然 webpack 實際上做的東西還要來的更多，比如這個簡化的 bundler 在引入時就沒辦法省略副檔名，當然引入其它類型的檔案更是完全不行的，這部份就是 webpack 的 loader 所做的事了， loader 會把其它類型的檔案也轉換成 webpack 所能處理的 js 檔，像 css 就是以字串的形式附在程式碼裡，而圖片等則是以檔名的形式
 
 下一篇就來介紹 webpack 的 loader 在做什麼
