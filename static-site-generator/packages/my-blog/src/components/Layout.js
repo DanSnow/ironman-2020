@@ -1,11 +1,15 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { Helmet } from 'generator'
 
 export function Layout({ title = 'My Blog', children }) {
   const isHome = useLocation().pathname === '/'
 
   return (
     <div className="max-w-screen-sm mx-auto">
+      <Helmet>
+        <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+      </Helmet>
       <header>
         <Link to="/">
           {isHome ? (

@@ -12,6 +12,7 @@ import { noop, findFirstMap } from './utils'
 import { constants } from 'fs'
 import { access, readFile } from 'fs/promises'
 import { compile, render } from 'eta'
+import { Helmet } from 'react-helmet'
 
 const pkg = importCwd('./package.json')
 const config = importCwd('./config.js').default
@@ -44,14 +45,27 @@ async function renderHTML(location) {
   const route = findFirstMap(routes, findMatchRoute) || { params: {}, getInitialProps: noop }
 
   await route.getInitialProps({ store, route })
+
+  const defaultTitle = config.title || pkg.name || 'My Static site'
+  const output = renderToString(
+    <AppProvider store={store} location={location} title={defaultTitle}>
+      {renderRoutes(routes, notFound)}
+    </AppProvider>
+  )
+
+  const helmet = Helmet.renderStatic()
+  const title = helmet.title.toString()
+  const meta = helmet.meta.toString()
+  const link = helmet.link.toString()
+  const head = [title, meta, link].join('\n')
+
   const template = await templatePromise
   return render(template, {
-    title: config.title || pkg.name || 'My Static site',
-    output: renderToString(
-      <AppProvider store={store} location={location}>
-        {renderRoutes(routes, notFound)}
-      </AppProvider>
-    ),
+    title,
+    head,
+    meta,
+    link,
+    output,
   })
 }
 
@@ -62,7 +76,7 @@ async function loadTemplate() {
     const content = await readFile(path, 'utf-8')
     return compile(content)
   } catch {
-    const content = await readFile(resolve(__dirname, 'app/index.html'))
+    const content = await readFile(resolve(__dirname, 'app/index.html'), 'utf-8')
     return compile(content)
   }
 }

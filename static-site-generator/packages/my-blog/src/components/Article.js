@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { articleSelector } from '../slices/articles'
 import { useParams } from 'react-router-dom'
 import { notFound } from '../data'
+import { Helmet } from 'generator'
 
 function getArticle() {
   const params = useParams()
@@ -15,6 +16,9 @@ export function Article({ article = getArticle() }) {
 
   return (
     <article>
+      <Helmet>
+        <title>My Blog - {title}</title>
+      </Helmet>
       <h1 className="text-4xl text-center font-bold mb-8">{title}</h1>
       <p className="text-gray-700">{content}</p>
     </article>
