@@ -6,5 +6,9 @@
     <div id="root">
       <%~ it.output %>
     </div>
+    <script>
+      window.__INITIAL_STATE__ = JSON.parse('<%~ it.state %>')
+    </script>
+    <script src="/bundle.js"></script>
   </body>
 </html>

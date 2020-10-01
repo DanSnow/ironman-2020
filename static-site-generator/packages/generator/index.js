@@ -1,1 +1,8 @@
+export { default as React } from 'react'
+export { default as ReactDOM } from 'react-dom'
+export { Switch, Route } from 'react-router-dom'
 export { Helmet } from 'react-helmet'
+export { noop } from './src/utils'
+export { createStore } from './src/app/store'
+export { AppProvider } from './src/app/client/AppProvider'
+export { Page } from './src/app/client/Page'
