@@ -8,7 +8,9 @@
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
-    "@babel/register": "^7.11.5"
+    "@babel/register": "^7.11.5",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.4.0",

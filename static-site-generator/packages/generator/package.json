@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.4.0",
+    "babel-loader": "^8.1.0",
     "eta": "^1.11.0",
     "express": "^4.17.1",
     "globby": "^11.0.1",
@@ -19,12 +20,16 @@
     "import-modules": "^2.0.0",
     "ky": "^0.23.0",
     "ky-universal": "^0.8.2",
+    "pnp-webpack-plugin": "^1.6.4",
+    "prettier": "^2.1.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-helmet": "^6.1.0",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
-    "slugify": "^1.4.5"
+    "slugify": "^1.4.5",
+    "ts-dedent": "^2.0.0",
+    "webpack": "^4.44.2"
   }
 }

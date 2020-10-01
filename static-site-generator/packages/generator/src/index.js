@@ -6,13 +6,15 @@ import { matchPath } from 'react-router-dom'
 import importCwd from 'import-cwd'
 import importModules from 'import-modules'
 import { createStore } from './app/store'
-import { AppProvider } from './app/components/AppProvider'
+import { AppProvider } from './app/server/AppProvider'
 import { buildRoutes, renderRoutes } from './routes'
 import { noop, findFirstMap } from './utils'
 import { constants } from 'fs'
 import { access, readFile } from 'fs/promises'
 import { compile, render } from 'eta'
 import { Helmet } from 'react-helmet'
+import { codegen } from './codegen'
+import { bundle } from './app/webpack'
 
 const pkg = importCwd('./package.json')
 const config = importCwd('./config.js').default
@@ -27,13 +29,21 @@ config.api(app)
 const routesPromise = buildRoutes()
 const templatePromise = loadTemplate()
 
+app.use(express.static(resolve(process.cwd(), '.cache/dist')))
 app.get('/*', async (req, res) => {
   res.send(await renderHTML(toLocation(req)))
 })
 
-app.listen(3000, () => {
-  console.log('server is running at http://localhost:3000')
-})
+async function main() {
+  codegen(await routesPromise)
+  await bundle()
+
+  app.listen(3000, () => {
+    console.log('server is running at http://localhost:3000')
+  })
+}
+
+main()
 
 async function renderHTML(location) {
   const store = createStore(reducer)
@@ -57,6 +67,7 @@ async function renderHTML(location) {
   const title = helmet.title.toString()
   const meta = helmet.meta.toString()
   const link = helmet.link.toString()
+  const state = JSON.stringify(store.getState())
   const head = [title, meta, link].join('\n')
 
   const template = await templatePromise
@@ -64,6 +75,7 @@ async function renderHTML(location) {
     title,
     head,
     meta,
+    state,
     link,
     output,
   })
