@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { StrictMode } from 'react'
 import { Provider } from 'react-redux'
 import { StaticRouter } from 'react-router-dom'
 import { Helmet } from 'react-helmet'
@@ -9,7 +9,9 @@ export function AppProvider({ store, location, children, title }) {
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      <StaticRouter location={location}>{children}</StaticRouter>
+      <StrictMode>
+        <StaticRouter location={location}>{children}</StaticRouter>
+      </StrictMode>
     </Provider>
   )
 }

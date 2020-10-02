@@ -1,13 +1,13 @@
 import dedent from 'ts-dedent'
 
-export const entry = dedent`
-import { AppProvider, ReactDOM, React } from 'generator'
+export const generateEntry = (title) => dedent`
+import { AppProvider, ReactDOM, React, setupJSONP } from 'generator'
 import { store } from './store.js'
 import Routes from './routes.js'
 
 function App() {
   return (
-    <AppProvider store={store}>
+    <AppProvider title="${title}" store={store}>
       <Routes />
     </AppProvider>
   )

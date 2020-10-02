@@ -1,9 +1,19 @@
-import { configurestore } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
+import { __record } from './slices/record'
 
-export function createstore(reducer) {
-  let preloadedstate
+export function createStore(reducer, middleware = []) {
+  let preloadedState
+
   if (typeof window !== 'undefined') {
-    preloadedstate = window.__initial_state__
+    preloadedState = window.__INITIAL_STATE__
   }
-  return configurestore({ reducer, preloadedstate })
+
+  return configureStore({
+    reducer: {
+      ...reducer,
+      __record: __record.reducer,
+    },
+    preloadedState,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(middleware),
+  })
 }
