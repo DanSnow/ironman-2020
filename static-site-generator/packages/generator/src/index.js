@@ -10,7 +10,8 @@ import { AppProvider } from './app/server/AppProvider'
 import { buildRoutes, renderRoutes } from './routes'
 import { noop, findFirstMap } from './utils'
 import { constants } from 'fs'
-import { access, readFile, mkdir, writeFile } from 'fs/promises'
+import { access, readFile, mkdir, writeFile, copyFile } from 'fs/promises'
+import serialize from 'serialize-javascript'
 import { compile, render } from 'eta'
 import { Helmet } from 'react-helmet'
 import { codegen } from './codegen'
@@ -24,6 +25,7 @@ const config = importCwd('./config.js').default
 const app = express()
 const defaultTitle = config.title || pkg.name || 'My Static site'
 const dist = resolve(process.cwd(), 'dist')
+const bundlePath = resolve(process.cwd(), '.cache/dist/bundle.js')
 
 const slices = importModules(resolve(process.cwd(), 'src/slices'))
 
@@ -34,10 +36,19 @@ config.api(app)
 const routesPromise = buildRoutes()
 const templatePromise = loadTemplate()
 
-app.use(express.static(resolve(process.cwd(), '.cache/dist')))
 app.get('/*', async (req, res) => {
-  const { html } = await renderHTML(toLocation(req))
-  res.send(html)
+  const payload = !!req.query.payload
+  const { html, actions } = await renderHTML(toLocation(req))
+  if (payload) {
+    res.send(
+      renderPayload({
+        path: req.path,
+        actions,
+      })
+    )
+  } else {
+    res.send(html)
+  }
 })
 
 async function main() {
@@ -48,7 +59,7 @@ async function main() {
   })
   await bundle()
 
-  app.listen(3000, () => {
+  const server = app.listen(3000, () => {
     console.log('server is running at http://localhost:3000')
   })
 
@@ -64,10 +75,23 @@ async function main() {
   }
 
   for (const url of possibleRoute) {
-    const body = await ky.get(`http://localhost:3000${url}`).text()
-    await mkdir(resolve(dist, url.substr(1)), { recursive: true })
-    await writeFile(resolve(dist, url.substr(1), 'index.html'), body)
+    const path = url.substr(1)
+    await mkdir(resolve(dist, path), { recursive: true })
+    await fetchHTML(url, path)
+    await fetchPayload(url, path)
   }
+  await copyFile(bundlePath, resolve(dist, 'bundle.js'))
+  server.close()
+}
+
+async function fetchPayload(url, path) {
+  const body = await ky.get(`http://localhost:3000${url}`, { searchParams: { payload: true } }).text()
+  await writeFile(resolve(dist, path, 'payload.js'), body)
+}
+
+async function fetchHTML(url, path) {
+  const body = await ky.get(`http://localhost:3000${url}`).text()
+  await writeFile(resolve(dist, path, 'index.html'), body)
 }
 
 main()
@@ -110,6 +134,10 @@ async function renderHTML(location) {
     }),
     actions: state.__record.pages[location.pathname],
   }
+}
+
+function renderPayload({ path, actions }) {
+  return `__GENERATOR_JSONP__('${path}', ${serialize(actions, { isJSON: true })})`
 }
 
 async function loadTemplate() {

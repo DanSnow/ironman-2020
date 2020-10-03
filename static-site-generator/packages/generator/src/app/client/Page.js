@@ -1,36 +1,37 @@
-import React, { useEffect, useState } from 'react'
-import { useStore, useSelector } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useRouteMatch } from 'react-router-dom'
-import { noop } from '../../utils'
-import { pageSelector } from '../slices/record'
+import { pageSelector, __record } from '../slices/record'
+import { join } from 'path'
 
-export function Page({ component: Component, getInitialProps = noop }) {
+export function Page({ component: Component }) {
   const route = useRouteMatch()
   const currentPage = useSelector((state) => state.__record.currentPage)
-  const actions = useSelector((state) => pageSelector(state, route.path))
-  const [ready, setReady] = useState(typeof actions !== 'undefined')
-  const store = useStore()
-
-  if (actions && route.path !== currentPage) {
-    for (const action of actions) {
-      store.dispatch(action)
-    }
-  }
+  const actions = useSelector((state) => pageSelector(state, route.url))
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    const fetch = async () => {
-      await getInitialProps({ route, store })
-      setReady(true)
+    if (!actions) {
+      loadPayload(route.url)
     }
+  }, [actions, route])
 
-    if (!ready) {
-      fetch()
+  if (actions) {
+    if (route.path !== currentPage) {
+      for (const action of actions) {
+        dispatch(action)
+      }
+      dispatch(__record.actions.setCurrentPage(route.url))
     }
-  }, [getInitialProps, ready])
-
-  if (ready) {
-    return <Component />
+  } else {
+    return null
   }
 
-  return null
+  return <Component />
+}
+
+function loadPayload(url) {
+  const $script = document.createElement('script')
+  $script.src = join(url, 'payload.js')
+  document.head.append($script)
 }

@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Helmet } from 'generator'
 
-export function Layout({ title = 'My Blog', children }) {
+export function Layout({ children }) {
   const isHome = useLocation().pathname === '/'
 
   return (
@@ -13,9 +13,9 @@ export function Layout({ title = 'My Blog', children }) {
       <header>
         <Link to="/">
           {isHome ? (
-            <h1 className="text-4xl text-center font-bold mb-8">{title}</h1>
+            <h1 className="text-4xl text-center font-bold mb-8">My Blog</h1>
           ) : (
-            <h3 className="text-3xl text-center font-bold mb-8">{title}</h3>
+            <h3 className="text-3xl text-center font-bold mb-8">My Blog</h3>
           )}
         </Link>
         <nav>

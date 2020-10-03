@@ -5,6 +5,8 @@ import { AppProvider, ReactDOM, React, setupJSONP } from 'generator'
 import { store } from './store.js'
 import Routes from './routes.js'
 
+setupJSONP(store)
+
 function App() {
   return (
     <AppProvider title="${title}" store={store}>

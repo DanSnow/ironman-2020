@@ -21,6 +21,9 @@ export const __record = createSlice({
     loadPage(state, { payload: { path, actions } }) {
       state.pages[path] = actions
     },
+    setCurrentPage(state, { payload }) {
+      state.currentPage = payload
+    },
   },
 })
 
