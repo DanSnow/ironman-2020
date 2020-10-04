@@ -1,0 +1,11 @@
+{
+  "name": "webpack-plugins",
+  "devDependencies": {
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {
+    "del": "^6.0.0",
+    "webpack-sources": "^2.0.1"
+  }
+}
