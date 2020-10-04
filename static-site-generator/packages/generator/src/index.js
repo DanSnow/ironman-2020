@@ -19,6 +19,8 @@ import { bundle } from './app/webpack'
 import { record } from './app/middleware/record'
 import { __record } from './app/slices/record'
 import ky from 'ky-universal'
+import { ApolloServer } from 'apollo-server-express'
+import { typeDefs, resolvers } from './schema'
 
 const pkg = importCwd('./package.json')
 const config = importCwd('./config.js').default
@@ -30,6 +32,13 @@ const bundlePath = resolve(process.cwd(), '.cache/dist/bundle.js')
 const slices = importModules(resolve(process.cwd(), 'src/slices'))
 
 const reducer = createReducer(slices)
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+})
+
+server.applyMiddleware({ app })
 
 config.api(app)
 
@@ -81,7 +90,7 @@ async function main() {
     await fetchPayload(url, path)
   }
   await copyFile(bundlePath, resolve(dist, 'bundle.js'))
-  server.close()
+  // server.close()
 }
 
 async function fetchPayload(url, path) {
