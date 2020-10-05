@@ -1,24 +1,38 @@
+import { schemaComposer } from 'graphql-compose'
+import { composeWithJson } from 'graphql-compose-json'
 import importCwd from 'import-cwd'
-import { gql } from 'apollo-server-express'
 
 const config = importCwd('./config.js').default
 
-export const typeDefs = gql`
-  type Article {
-    slug: ID!
-    title: String!
-    content: String!
-  }
+async function createNodes(typename, cb) {
+  const nodes = []
+  let schema
 
-  type Query {
-    allArticles: [Article]
-    article(slug: ID!): Article
-  }
-`
+  await cb((node) => {
+    nodes.push(node)
+    if (!schema) {
+      schema = composeWithJson(typename, node)
+    }
+  })
 
-export const resolvers = {
-  Query: {
-    allArticles: () => config.data.getArticles(),
-    article: (slug) => config.data.getArticle(slug),
-  },
+  schemaComposer.Query.addFields({
+    [`all${typename}s`]: {
+      type: schema.getTypePlural(),
+      resolve: () => nodes,
+    },
+    [typename.toLowerCase()]: {
+      type: schema,
+      args: {
+        id: 'ID!',
+      },
+      resolve: (_, { id }) => {
+        return nodes.find((x) => x.id === id)
+      },
+    },
+  })
+}
+
+export async function loadSchema() {
+  await config.data(createNodes)
+  return schemaComposer.buildSchema()
 }

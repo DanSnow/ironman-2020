@@ -20,7 +20,7 @@ import { record } from './app/middleware/record'
 import { __record } from './app/slices/record'
 import ky from 'ky-universal'
 import { ApolloServer } from 'apollo-server-express'
-import { typeDefs, resolvers } from './schema'
+import { loadSchema } from './schema'
 
 const pkg = importCwd('./package.json')
 const config = importCwd('./config.js').default
@@ -33,32 +33,10 @@ const slices = importModules(resolve(process.cwd(), 'src/slices'))
 
 const reducer = createReducer(slices)
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-})
-
-server.applyMiddleware({ app })
-
 config.api(app)
 
 const routesPromise = buildRoutes()
 const templatePromise = loadTemplate()
-
-app.get('/*', async (req, res) => {
-  const payload = !!req.query.payload
-  const { html, actions } = await renderHTML(toLocation(req))
-  if (payload) {
-    res.send(
-      renderPayload({
-        path: req.path,
-        actions,
-      })
-    )
-  } else {
-    res.send(html)
-  }
-})
 
 async function main() {
   const data = await routesPromise
@@ -67,6 +45,22 @@ async function main() {
     ...data,
   })
   await bundle()
+  const gql = new ApolloServer({ schema: await loadSchema() })
+  gql.applyMiddleware({ app })
+  app.get('/*', async (req, res) => {
+    const payload = !!req.query.payload
+    const { html, actions } = await renderHTML(toLocation(req))
+    if (payload) {
+      res.send(
+        renderPayload({
+          path: req.path,
+          actions,
+        })
+      )
+    } else {
+      res.send(html)
+    }
+  })
 
   const server = app.listen(3000, () => {
     console.log('server is running at http://localhost:3000')

@@ -12,9 +12,11 @@ const getArticle = (slug) => {
 export default {
   title: 'My Blog',
 
-  data: {
-    getArticles,
-    getArticle,
+  data(createNodes) {
+    createNodes('Article', (createNode) => {
+      const articles = getArticles().map(({ slug, ...rest }) => ({ id: slug, slug, ...rest }))
+      articles.forEach(createNode)
+    })
   },
 
   api: (app) => {
