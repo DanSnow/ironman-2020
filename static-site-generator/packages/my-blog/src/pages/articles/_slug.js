@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout } from '../../components/Layout'
+import { Layout } from '../../layouts/default'
 import { Article } from '../../components/Article'
 import { fetchArticleById, fetchArticles, articleSelector } from '../../slices/articles'
 import { gql } from 'generator'

@@ -1,13 +1,66 @@
 import React from 'react'
-import { resolve, join, relative, parse } from 'path'
+import { resolve, join, relative, parse, dirname } from 'path'
 import globby from 'globby'
 import importCwd from 'import-cwd'
 import { Switch, Route } from 'react-router-dom'
 import { noop } from './utils'
 import { Page } from './app/server/Page'
+import mdx from '@mdx-js/mdx'
+import { readFile, mkdir, writeFile } from 'fs/promises'
+import pMap from 'p-map'
 
 export async function buildRoutes() {
   const pagesPath = resolve(process.cwd(), 'src/pages')
+  const [jsRoutes, mdxRoutes] = await Promise.all([collectJsRoutes(pagesPath), collectMdxRoutes(pagesPath)])
+  const routes = jsRoutes.concat(mdxRoutes)
+
+  routes.sort((a, b) => (a.dynamic !== b.dynamic && !b.dynamic ? 1 : 0))
+
+  return {
+    notFound: resolveNotFound(),
+    routes,
+  }
+}
+
+async function collectMdxRoutes(pagesPath) {
+  const absolutePaths = await globby([join(pagesPath, '**/*.mdx')])
+  const mdxPath = resolve(dirname(pagesPath), '.mdx')
+  await mkdir(mdxPath, { recursive: true })
+  const routes = await pMap(absolutePaths, async (absolutePath) => {
+    const path = relative(pagesPath, absolutePath)
+    const parsed = parse(path)
+    const base = `/${parsed.dir}`
+
+    const content = await readFile(absolutePath)
+    const { url, dynamic } = generateURL(parsed, base)
+    const code = await mdx(content)
+    const outputPath = resolve(mdxPath, path.replace('.mdx', '.js'))
+    const lines = code.split('\n')
+
+    await mkdir(dirname(outputPath), { recursive: true })
+    await writeFile(outputPath, [lines[0], `import {mdx} from 'generator'`, ...lines.slice(1)].join('\n'))
+    const cachePath = relative(process.cwd(), outputPath)
+    const mod = importCwd('./' + cachePath)
+
+    return {
+      dynamic,
+      url,
+      file: cachePath,
+      getStaticPaths: noop,
+      getInitialProps: noop,
+      routeProps: {
+        exact: url === '/',
+        path: url,
+      },
+      props: {
+        component: mod.default,
+      },
+    }
+  })
+  return routes
+}
+
+async function collectJsRoutes(pagesPath) {
   const absolutePaths = await globby([join(pagesPath, '**/*.js')])
   const routes = absolutePaths.map((absolutePath) => {
     const projectPath = relative(process.cwd(), absolutePath)
@@ -34,13 +87,7 @@ export async function buildRoutes() {
       },
     }
   })
-
-  routes.sort((a, b) => (a.dynamic !== b.dynamic && !b.dynamic ? 1 : 0))
-
-  return {
-    notFound: resolveNotFound(),
-    routes,
-  }
+  return routes
 }
 
 function generateURL(parsed, base) {

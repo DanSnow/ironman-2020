@@ -95,7 +95,7 @@ async function main() {
     await fetchPayload(url, path)
   }
   await copyFile(bundlePath, resolve(dist, 'bundle.js'))
-  // server.close()
+  server.close()
 }
 
 async function fetchPayload(url, path) {
