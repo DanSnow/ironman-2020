@@ -4,6 +4,7 @@ import globby from 'globby'
 import importCwd from 'import-cwd'
 import { Switch, Route } from 'react-router-dom'
 import { noop } from './utils'
+import { Page } from './app/server/Page'
 
 export async function buildRoutes() {
   const pagesPath = resolve(process.cwd(), 'src/pages')
@@ -23,9 +24,12 @@ export async function buildRoutes() {
       file: projectPath,
       getStaticPaths: mod.getStaticPaths || noop,
       getInitialProps: mod.getInitialProps || noop,
-      props: {
+      routeProps: {
         exact: url === '/',
         path: url,
+      },
+      props: {
+        query: mod.query,
         component: mod.default,
       },
     }
@@ -56,8 +60,10 @@ function generateURL(parsed, base) {
 export function renderRoutes(routes, notFound) {
   return (
     <Switch>
-      {routes.map(({ url, props }) => (
-        <Route key={url} {...props} />
+      {routes.map(({ url, routeProps, props }) => (
+        <Route key={url} {...routeProps}>
+          <Page {...props} />
+        </Route>
       ))}
       <Route component={notFound} />
     </Switch>

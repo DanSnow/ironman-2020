@@ -2,9 +2,10 @@ import { join } from 'path'
 import { format } from 'prettier'
 
 export function generateRoutes(routes) {
-  const routesInfo = routes.map(({ file, url, props }) => ({
+  const routesInfo = routes.map(({ file, url, routeProps, props }) => ({
     file,
     url,
+    routeProps,
     props,
     name: `_${url.replace(/[/:]/g, '_')}`,
   }))
@@ -18,9 +19,9 @@ export function generateRoutes(routes) {
       <Switch>
         ${routesInfo
           .map(
-            ({ props, name }) =>
-              `<Route path="${props.path}" exact={${props.exact}} >
-                <Page component={${name}.default} getInitialProps={${name}.getInitialProps} />
+            ({ routeProps, name }) =>
+              `<Route key="${routeProps.path}" path="${routeProps.path}" exact={${routeProps.exact}} >
+                <Page component={${name}.default} getInitialProps={${name}.getInitialProps} query={${name}.query} />
                </Route>`
           )
           .join('\n')}

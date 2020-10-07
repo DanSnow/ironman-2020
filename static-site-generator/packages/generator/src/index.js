@@ -21,6 +21,8 @@ import { __record } from './app/slices/record'
 import ky from 'ky-universal'
 import { ApolloServer } from 'apollo-server-express'
 import { loadSchema } from './schema'
+import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { getDataFromTree } from '@apollo/client/react/ssr'
 
 const pkg = importCwd('./package.json')
 const config = importCwd('./config.js').default
@@ -49,12 +51,21 @@ async function main() {
   gql.applyMiddleware({ app })
   app.get('/*', async (req, res) => {
     const payload = !!req.query.payload
-    const { html, actions } = await renderHTML(toLocation(req))
+    const { html, actions, client, route } = await renderHTML(toLocation(req))
+    const gql = route.query
+      ? {
+          query: route.query,
+          variables: route.params,
+          data: client.readQuery({ query: route.query, variables: route.params }),
+        }
+      : null
+
     if (payload) {
       res.send(
         renderPayload({
           path: req.path,
           actions,
+          gql,
         })
       )
     } else {
@@ -100,21 +111,28 @@ async function fetchHTML(url, path) {
 main()
 
 async function renderHTML(location) {
+  const client = new ApolloClient({
+    ssrMode: true,
+    uri: 'http://localhost:3000/graphql',
+    cache: new InMemoryCache(),
+  })
   const store = createStore(reducer, [record])
   const { notFound, routes } = await routesPromise
-  const findMatchRoute = ({ props, getInitialProps }) => {
-    const match = matchPath(location.pathname, props)
-    return match ? { ...match, getInitialProps } : undefined
+  const findMatchRoute = ({ props, getInitialProps, routeProps }) => {
+    const match = matchPath(location.pathname, routeProps)
+    return match ? { ...match, getInitialProps, query: props.query } : undefined
   }
   const route = findFirstMap(routes, findMatchRoute) || { params: {}, getInitialProps: noop }
 
   await route.getInitialProps({ store, route })
-
-  const output = renderToString(
-    <AppProvider store={store} location={location} title={defaultTitle}>
+  const App = (
+    <AppProvider store={store} client={client} location={location} title={defaultTitle}>
       {renderRoutes(routes, notFound)}
     </AppProvider>
   )
+  await getDataFromTree(App)
+
+  const output = renderToString(App)
 
   store.dispatch(__record.actions.createPage(location.pathname))
 
@@ -132,15 +150,18 @@ async function renderHTML(location) {
       head,
       meta,
       state: JSON.stringify(state),
+      apollo: JSON.stringify(client.extract()),
       link,
       output,
     }),
     actions: state.__record.pages[location.pathname],
+    client,
+    route,
   }
 }
 
-function renderPayload({ path, actions }) {
-  return `__GENERATOR_JSONP__('${path}', ${serialize(actions, { isJSON: true })})`
+function renderPayload({ path, actions, gql }) {
+  return `__GENERATOR_JSONP__('${path}', ${serialize(actions, { isJSON: true })}, ${serialize(gql)})`
 }
 
 async function loadTemplate() {

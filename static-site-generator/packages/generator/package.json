@@ -11,6 +11,7 @@
     "@babel/register": "^7.11.5"
   },
   "dependencies": {
+    "@apollo/client": "^3.2.2",
     "@reduxjs/toolkit": "^1.4.0",
     "apollo-server": "^2.18.1",
     "apollo-server-express": "^2.18.1",
