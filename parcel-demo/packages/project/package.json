@@ -1,0 +1,7 @@
+{
+  "name": "project",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-raw": "workspace:packages/parcel-plugin-raw"
+  }
+}

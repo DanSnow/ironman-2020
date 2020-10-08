@@ -1,0 +1,6 @@
+{
+  "name": "parcel-plugin-raw",
+  "peerDependencies": {
+    "parcel-bundler": "*"
+  }
+}

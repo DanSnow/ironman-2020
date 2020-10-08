@@ -1,0 +1,7 @@
+{
+  "name": "parcel-demo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
