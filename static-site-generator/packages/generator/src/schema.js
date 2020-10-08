@@ -1,10 +1,11 @@
 import { schemaComposer } from 'graphql-compose'
 import { composeWithJson } from 'graphql-compose-json'
 import importCwd from 'import-cwd'
+import { noop } from './utils'
 
 const config = importCwd('./config.js').default
 
-async function createNodes(typename, cb) {
+export async function createNodes(typename, cb) {
   const nodes = []
   let schema
 
@@ -33,6 +34,7 @@ async function createNodes(typename, cb) {
 }
 
 export async function loadSchema() {
-  await config.data(createNodes)
+  const { data = noop } = config
+  await data(createNodes)
   return schemaComposer.buildSchema()
 }

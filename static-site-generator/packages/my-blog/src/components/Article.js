@@ -20,7 +20,7 @@ export function Article({ article = getArticle() }) {
         <title>My Blog - {title}</title>
       </Helmet>
       <h1 className="text-4xl text-center font-bold mb-8">{title}</h1>
-      <p className="text-gray-700">{content}</p>
+      <div className="text-gray-700" dangerouslySetInnerHTML={{ __html: content }} />
     </article>
   )
 }

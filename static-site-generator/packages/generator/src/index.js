@@ -23,6 +23,9 @@ import { ApolloServer } from 'apollo-server-express'
 import { loadSchema } from './schema'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { getDataFromTree } from '@apollo/client/react/ssr'
+import pEach from 'p-each-series'
+import { loadSource } from './sources/filesystem'
+import { createNodes } from './schema'
 
 const pkg = importCwd('./package.json')
 const config = importCwd('./config.js').default
@@ -47,6 +50,7 @@ async function main() {
     ...data,
   })
   await bundle()
+  await pEach(config.sources, (options) => loadSource({ createNodes, options }))
   const gql = new ApolloServer({ schema: await loadSchema() })
   gql.applyMiddleware({ app })
   app.get('/*', async (req, res) => {

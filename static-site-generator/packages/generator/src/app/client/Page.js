@@ -32,7 +32,7 @@ const PageComponent = function ({ component: Component, query, client }) {
         variables: route.params,
       })
 
-      observableQuery.result().then((data) => {
+      observableQuery.result().then(({ data }) => {
         setData(data)
       })
     }

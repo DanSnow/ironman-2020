@@ -1,7 +1,7 @@
 import React from 'react'
 import { Layout } from '../../layouts/default'
 import { Article } from '../../components/Article'
-import { fetchArticleById, fetchArticles, articleSelector } from '../../slices/articles'
+import { fetchArticles, articleSelector } from '../../slices/articles'
 import { gql } from 'generator'
 
 export const query = gql`
@@ -19,10 +19,6 @@ export async function getStaticPaths({ store }) {
 
   const articles = articleSelector.selectAll(store.getState())
   return articles.map(({ slug }) => `/articles/${slug}`)
-}
-
-export async function getInitialProps({ store, route }) {
-  await store.dispatch(fetchArticleById(route.params.slug))
 }
 
 export default function ArticlePage({ data }) {
