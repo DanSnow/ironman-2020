@@ -1,7 +1,6 @@
 import React from 'react'
 import { Layout } from '../../layouts/default'
 import { Article } from '../../components/Article'
-import { fetchArticles, articleSelector } from '../../slices/articles'
 import { gql } from 'generator'
 
 export const query = gql`
@@ -14,11 +13,15 @@ export const query = gql`
   }
 `
 
-export async function getStaticPaths({ store }) {
-  await store.dispatch(fetchArticles())
-
-  const articles = articleSelector.selectAll(store.getState())
-  return articles.map(({ slug }) => `/articles/${slug}`)
+export async function getStaticPaths({ query }) {
+  const { data } = await query(gql`
+    query {
+      allArticles {
+        slug
+      }
+    }
+  `)
+  return data.allArticles.map(({ slug }) => ({ params: { slug } }))
 }
 
 export default function ArticlePage({ data }) {

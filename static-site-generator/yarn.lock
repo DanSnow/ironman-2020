@@ -4297,6 +4297,7 @@ fsevents@~2.1.2:
     ky-universal: ^0.8.2
     p-each-series: ^2.1.0
     p-map: ^4.0.0
+    path-to-regexp: ^6.2.0
     pnp-webpack-plugin: ^1.6.4
     prettier: ^2.1.2
     react: ^16.13.1
@@ -6468,6 +6469,13 @@ fsevents@~2.1.2:
   dependencies:
     isarray: 0.0.1
   checksum: 4c0d9aaf3fc55db0b2d9aab379856acbf4e437f2252bbc2a178aec9f707c8457f8084ea6243a80e0b37c8c1c20d23e918cd43e772a7e71142a8ad67af699686b
+  languageName: node
+  linkType: hard
+
+"path-to-regexp@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "path-to-regexp@npm:6.2.0"
+  checksum: 4116de71f5453163910347f199ab28fdd07f4053ed88093acb42dc044a2e5e7d9e18379e81e8d5d982d1b88291be3666e56be34a0741298673248fd21e3c1c16
   languageName: node
   linkType: hard
 

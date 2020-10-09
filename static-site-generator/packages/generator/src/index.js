@@ -5,12 +5,13 @@ import { mkdir, writeFile, copyFile } from 'fs/promises'
 import { codegen } from './codegen'
 import { bundle } from './app/webpack'
 import ky from 'ky-universal'
-import { createNodes } from './schema'
+import { createNodes, loadSchema } from './schema'
 import pEach from 'p-each-series'
 import { loadSource } from './sources/filesystem'
 import { config } from './config'
 import { reducer } from './reducer'
 import { configureServer } from './server'
+import { execute } from 'graphql'
 
 const dist = resolve(process.cwd(), 'dist')
 const bundlePath = resolve(process.cwd(), '.cache/dist/bundle.js')
@@ -23,13 +24,17 @@ async function main() {
   })
   await bundle()
   await pEach(config.sources, (options) => loadSource({ createNodes, options }))
-  const server = await configureServer(data)
+  const schema = await loadSchema()
+  const server = await configureServer(data, schema)
+  const query = (query) => {
+    return execute(schema, query)
+  }
 
   let possibleRoute = []
   for (const route of data.routes) {
     if (route.dynamic) {
       const store = createStore(reducer)
-      const paths = await route.getStaticPaths({ store })
+      const paths = await route.getStaticPaths({ store, query })
       possibleRoute = possibleRoute.concat(paths)
     } else {
       possibleRoute.push(route.url)

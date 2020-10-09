@@ -1,14 +1,8 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { articleSelector } from '../slices/articles'
-import { useParams } from 'react-router-dom'
-import { notFound } from '../data'
 import { Helmet } from 'generator'
 
 function getArticle() {
-  const params = useParams()
-  const article = useSelector((state) => articleSelector.selectById(state, params.slug))
-  return article || notFound
+  return { title: 'Not Found', content: 'Not Found' }
 }
 
 export function Article({ article = getArticle() }) {

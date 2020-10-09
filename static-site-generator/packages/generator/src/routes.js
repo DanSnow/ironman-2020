@@ -8,6 +8,7 @@ import { Page } from './app/server/Page'
 import mdx from '@mdx-js/mdx'
 import { readFile, mkdir, writeFile } from 'fs/promises'
 import pMap from 'p-map'
+import { compile } from 'path-to-regexp'
 
 export async function buildRoutes() {
   const pagesPath = resolve(process.cwd(), 'src/pages')
@@ -70,12 +71,27 @@ async function collectJsRoutes(pagesPath) {
 
     const mod = importCwd('./' + projectPath)
     const { url, dynamic } = generateURL(parsed, base)
+    const toPath = compile(url)
+
+    const getStaticPaths = mod.getStaticPaths || noop
 
     return {
       dynamic,
       url,
       file: projectPath,
-      getStaticPaths: mod.getStaticPaths || noop,
+      getStaticPaths: async (...args) => {
+        const res = await getStaticPaths(...args)
+        if (Array.isArray(res)) {
+          return res.map((x) => {
+            if (typeof x === 'string') {
+              return x
+            }
+            const { params } = x
+            return toPath(params)
+          })
+        }
+        return res
+      },
       getInitialProps: mod.getInitialProps || noop,
       routeProps: {
         exact: url === '/',

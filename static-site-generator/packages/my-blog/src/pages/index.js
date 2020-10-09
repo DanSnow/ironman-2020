@@ -1,16 +1,22 @@
 import React from 'react'
+import { gql } from 'generator'
 import { Layout } from '../layouts/default'
 import { ArticleList } from '../components/ArticleList'
-import { fetchArticles } from '../slices/articles'
 
-export async function getInitialProps({ store }) {
-  await store.dispatch(fetchArticles())
-}
+export const query = gql`
+  query {
+    allArticles {
+      slug
+      title
+      content
+    }
+  }
+`
 
-export default function Index() {
+export default function Index({ data = {} }) {
   return (
     <Layout>
-      <ArticleList />
+      <ArticleList articles={data.allArticles} />
     </Layout>
   )
 }

@@ -7,7 +7,6 @@ import { AppProvider } from './app/server/AppProvider'
 import { Helmet } from 'react-helmet'
 import { config } from './config'
 import { getDataFromTree } from '@apollo/client/react/ssr'
-import { loadSchema } from './schema'
 import { matchPath } from 'react-router-dom'
 import { noop, findFirstMap } from './utils'
 import { record } from './app/middleware/record'
@@ -19,11 +18,11 @@ import { renderToString } from 'react-dom/server'
 import { templatePromise } from './template'
 import { __record } from './app/slices/record'
 
-export async function configureServer(data) {
+export async function configureServer(data, schema) {
   const app = express()
   config.api(app)
 
-  const gql = new ApolloServer({ schema: await loadSchema() })
+  const gql = new ApolloServer({ schema })
   gql.applyMiddleware({ app })
   const template = await templatePromise
   app.get('/*', async (req, res) => {
