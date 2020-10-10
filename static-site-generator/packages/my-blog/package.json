@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.4.0",
+    "babel-plugin-macros": "^2.8.0",
     "generator": "workspace:packages/generator",
     "ky": "^0.23.0",
     "ky-universal": "^0.8.2",

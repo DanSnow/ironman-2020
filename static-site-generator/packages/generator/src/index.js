@@ -12,19 +12,22 @@ import { config } from './config'
 import { reducer } from './reducer'
 import { configureServer } from './server'
 import { execute } from 'graphql'
+import { executeStaticQueries } from './queries'
 
 const dist = resolve(process.cwd(), 'dist')
 const bundlePath = resolve(process.cwd(), '.cache/dist/bundle.js')
 
 async function main() {
+  await pEach(config.sources, (options) => loadSource({ createNodes, options }))
+  const schema = await loadSchema()
+  await executeStaticQueries(schema)
+
   const data = await buildRoutes()
   codegen({
     title: config.title,
     ...data,
   })
   await bundle()
-  await pEach(config.sources, (options) => loadSource({ createNodes, options }))
-  const schema = await loadSchema()
   const server = await configureServer(data, schema)
   const query = (query) => {
     return execute(schema, query)
