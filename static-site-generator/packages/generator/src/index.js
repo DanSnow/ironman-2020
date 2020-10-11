@@ -13,11 +13,14 @@ import { reducer } from './reducer'
 import { configureServer } from './server'
 import { execute } from 'graphql'
 import { executeStaticQueries } from './queries'
+import { patchRequire } from './hook'
+import { copy } from 'fs-extra'
 
 const dist = resolve(process.cwd(), 'dist')
-const bundlePath = resolve(process.cwd(), '.cache/dist/bundle.js')
+const webpackPath = resolve(process.cwd(), '.cache/dist')
 
 async function main() {
+  patchRequire()
   await pEach(config.sources, (options) => loadSource({ createNodes, options }))
   const schema = await loadSchema()
   await executeStaticQueries(schema)
@@ -50,7 +53,7 @@ async function main() {
     await fetchHTML(url, path)
     await fetchPayload(url, path)
   }
-  await copyFile(bundlePath, resolve(dist, 'bundle.js'))
+  await copy(webpackPath, dist)
   server.close()
 }
 

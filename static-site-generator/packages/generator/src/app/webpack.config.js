@@ -12,6 +12,9 @@ export default {
   },
 
   resolve: {
+    alias: {
+      '~': process.cwd(),
+    },
     plugins: [PnpWebpackPlugin],
   },
 
@@ -25,6 +28,10 @@ export default {
         test: /\.js$/,
         loader: require.resolve('babel-loader'),
         exclude: /node_modules/,
+      },
+      {
+        test: /\.(jpe?g|png)$/,
+        loader: require.resolve('./loaders/image-loader'),
       },
     ],
   },
