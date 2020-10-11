@@ -5177,6 +5177,7 @@ fsevents@~2.1.2:
     object-hash: ^2.0.3
     p-each-series: ^2.1.0
     p-map: ^4.0.0
+    p-map-series: ^2.1.0
     path-to-regexp: ^6.2.0
     pnp-webpack-plugin: ^1.6.4
     prettier: ^2.1.2
@@ -8104,6 +8105,13 @@ fsevents@~2.1.2:
   dependencies:
     p-reduce: ^1.0.0
   checksum: 721c1aaea4ad39ea03e1bb93315a552d58d77ced4d3a23a0efe5ec06ffb41d2f851fab1a381e43253357f79f02c5f954d4e86b4e38d82a8b4f0d6a48034ff511
+  languageName: node
+  linkType: hard
+
+"p-map-series@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "p-map-series@npm:2.1.0"
+  checksum: 6d6e8848a57142fdcca9475b01212420446191f0c20b3f84175108e7b116613e57470fbaee47ca49cc7c7ec563ee1c08fca7947098b64c83dd7ad5a58f3b4cc3
   languageName: node
   linkType: hard
 
