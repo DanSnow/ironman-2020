@@ -32,7 +32,7 @@ module.exports = [
     output: {
       libraryTarget: 'commonjs2',
     },
-    externals: ['vue'],
+    externals: ['vue', 'ky-universal', 'ky', 'vue-router', 'vuex'],
     target: 'node',
   },
   {

@@ -1,7 +1,7 @@
 const { resolve } = require('path')
 const express = require('express')
 const { createRenderer } = require('vue-server-renderer')
-const createApp = require('./dist/server').default
+const createApp = require('./src/entry-server')
 
 const template = `
 <html>
@@ -22,9 +22,13 @@ const renderer = createRenderer({
 
 app.use(express.static(resolve(__dirname, 'dist')))
 
-app.get('/', async (req, res) => {
+app.get('/api/foo', (req, res) => {
+  res.send({ message: 'Hello world' })
+})
+
+app.get('/*', async (req, res) => {
   const context = {}
-  const app = createApp()
+  const app = await createApp(context)
   const html = await renderer.renderToString(app, context)
   res.send(html)
 })

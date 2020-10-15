@@ -1,0 +1,160 @@
+diff --git a/server-plugin.js b/server-plugin.js
+index 54ba2b3ab0a43ac892f756942aafdad4310ac141..1e19dfc27cdb2769ac5db42189ccba1a5706f487 100644
+--- a/server-plugin.js
++++ b/server-plugin.js
+@@ -1,65 +1,75 @@
+-'use strict';
++"use strict";
+ 
+ /*  */
+ 
+-var isJS = function (file) { return /\.js(\?[^.]+)?$/.test(file); };
++var isJS = function ({ name }) {
++  return /\.js(\?[^.]+)?$/.test(name);
++};
+ 
+-var ref = require('chalk');
++var ref = require("chalk");
+ var red = ref.red;
+ var yellow = ref.yellow;
+ 
+ var prefix = "[vue-server-renderer-webpack-plugin]";
+-var warn = exports.warn = function (msg) { return console.error(red((prefix + " " + msg + "\n"))); };
+-var tip = exports.tip = function (msg) { return console.log(yellow((prefix + " " + msg + "\n"))); };
++var warn = (exports.warn = function (msg) {
++  return console.error(red(prefix + " " + msg + "\n"));
++});
++var tip = (exports.tip = function (msg) {
++  return console.log(yellow(prefix + " " + msg + "\n"));
++});
+ 
+ var validate = function (compiler) {
+-  if (compiler.options.target !== 'node') {
++  if (compiler.options.target !== "node") {
+     warn('webpack config `target` should be "node".');
+   }
+ 
+-  if (compiler.options.output && compiler.options.output.libraryTarget !== 'commonjs2') {
++  if (
++    compiler.options.output &&
++    compiler.options.output.libraryTarget !== "commonjs2"
++  ) {
+     warn('webpack config `output.libraryTarget` should be "commonjs2".');
+   }
+ 
+   if (!compiler.options.externals) {
+     tip(
+-      'It is recommended to externalize dependencies in the server build for ' +
+-      'better build performance.'
++      "It is recommended to externalize dependencies in the server build for " +
++        "better build performance."
+     );
+   }
+ };
+ 
+ var onEmit = function (compiler, name, hook) {
+-  if (compiler.hooks) {
+-    // Webpack >= 4.0.0
+-    compiler.hooks.emit.tapAsync(name, hook);
+-  } else {
+-    // Webpack < 4.0.0
+-    compiler.plugin('emit', hook);
+-  }
++  compiler.hooks.compilation.tap(name, (compilation) => {
++    compilation.hooks.processAssets.tapAsync(name, (_assets, cb) =>
++      hook(compilation, cb)
++    );
++  });
+ };
+ 
+-var VueSSRServerPlugin = function VueSSRServerPlugin (options) {
+-  if ( options === void 0 ) options = {};
++var VueSSRServerPlugin = function VueSSRServerPlugin(options) {
++  if (options === void 0) options = {};
+ 
+-  this.options = Object.assign({
+-    filename: 'vue-ssr-server-bundle.json'
+-  }, options);
++  this.options = Object.assign(
++    {
++      filename: "vue-ssr-server-bundle.json",
++    },
++    options
++  );
+ };
+ 
+-VueSSRServerPlugin.prototype.apply = function apply (compiler) {
+-    var this$1 = this;
++VueSSRServerPlugin.prototype.apply = function apply(compiler) {
++  var this$1 = this;
+ 
+   validate(compiler);
+ 
+-  onEmit(compiler, 'vue-server-plugin', function (compilation, cb) {
++  onEmit(compiler, "vue-server-plugin", function (compilation, cb) {
+     var stats = compilation.getStats().toJson();
+     var entryName = Object.keys(stats.entrypoints)[0];
+     var entryInfo = stats.entrypoints[entryName];
+ 
+     if (!entryInfo) {
+       // #5553
+-      return cb()
++      return cb();
+     }
+ 
+     var entryAssets = entryInfo.assets.filter(isJS);
+@@ -67,28 +77,32 @@ VueSSRServerPlugin.prototype.apply = function apply (compiler) {
+     if (entryAssets.length > 1) {
+       throw new Error(
+         "Server-side bundle should have one single entry file. " +
+-        "Avoid using CommonsChunkPlugin in the server config."
+-      )
++          "Avoid using CommonsChunkPlugin in the server config."
++      );
+     }
+ 
+     var entry = entryAssets[0];
+-    if (!entry || typeof entry !== 'string') {
++    if (!entry || typeof entry.name !== "string") {
+       throw new Error(
+-        ("Entry \"" + entryName + "\" not found. Did you specify the correct entry option?")
+-      )
++        'Entry "' +
++          entryName +
++          '" not found. Did you specify the correct entry option?'
++      );
+     }
+ 
+     var bundle = {
+       entry: entry,
+       files: {},
+-      maps: {}
++      maps: {},
+     };
+ 
+     stats.assets.forEach(function (asset) {
+       if (isJS(asset.name)) {
+         bundle.files[asset.name] = compilation.assets[asset.name].source();
+       } else if (asset.name.match(/\.js\.map$/)) {
+-        bundle.maps[asset.name.replace(/\.map$/, '')] = JSON.parse(compilation.assets[asset.name].source());
++        bundle.maps[asset.name.replace(/\.map$/, "")] = JSON.parse(
++          compilation.assets[asset.name].source()
++        );
+       }
+       // do not emit anything else for server
+       delete compilation.assets[asset.name];
+@@ -98,8 +112,12 @@ VueSSRServerPlugin.prototype.apply = function apply (compiler) {
+     var filename = this$1.options.filename;
+ 
+     compilation.assets[filename] = {
+-      source: function () { return json; },
+-      size: function () { return json.length; }
++      source: function () {
++        return json;
++      },
++      size: function () {
++        return json.length;
++      },
+     };
+ 
+     cb();
